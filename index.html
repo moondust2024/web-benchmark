@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU and DOM Performance Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #results {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #results div {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .progress {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        #score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff0000 !important;
+            margin-top: 20px;
+        }
+
+        #container {
+            display: none; /* 隐藏容器，避免影响布局 */
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+
+            #results div {
+                font-size: 1em;
+            }
+
+            .progress {
+                font-size: 1em;
+            }
+
+            #score {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CPU and DOM<br/> Performance Test</h1>
+    <button id="run-test">Run Performance Test</button>
+    <div id="results">
+        <div id="thread-count"></div>
+        <div id="dom-render-result"></div>
+        <div id="single-float-result"></div>
+        <div id="multi-float-result"></div>
+        <div id="single-int-result"></div>
+        <div id="multi-int-result"></div>
+        <div id="score"></div>
+    </div>
+    <div class="progress" id="progress"></div>
+    <div id="container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
