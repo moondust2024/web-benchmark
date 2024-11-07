@@ -47,11 +47,11 @@ function runTest() {
                                 updateResult('Multi Int result', multiThreadIntTime);
                                 progressElement.textContent = '';
 
-                                const domRenderScore = calculateScore(domRenderTime, 600, 100);
-                                const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 2000, 100);
-                                const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 500, 100);
-                                const singleThreadIntScore = calculateScore(singleThreadIntTime, 1200, 100);
-                                const multiThreadIntScore = calculateScore(multiThreadIntTime, 400, 100);
+                                const domRenderScore = calculateScore(domRenderTime, 1600, 100);
+                                const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
+                                const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
+                                const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
+                                const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
 
                                 const totalScore = (
                                     singleThreadFloatScore * 0.2 +
@@ -163,7 +163,7 @@ function runDOMPerformanceTest() {
     return new Promise((resolve) => {
         const startTime = performance.now();
 
-        generateDOMElements(100000); 
+        generateDOMElements(200000); 
         modifyDOMElements();
         removeDOMElements();
 
@@ -174,15 +174,62 @@ function runDOMPerformanceTest() {
 
 function generateDOMElements(count) {
     const container = document.getElementById('container');
+    if (!container) {
+        console.error("Container with ID 'container' not found.");
+        return;
+    }
+
     container.innerHTML = ''; // 清空容器
 
     const fragment = document.createDocumentFragment();
+
     for (let i = 0; i < count; i++) {
-        const div = document.createElement('div');
-        div.className = 'element';
-        div.textContent = `Element ${i}`;
-        fragment.appendChild(div);
+        // 创建元素
+        const element = document.createElement('div');
+        element.className = 'element';
+        element.textContent = `Element ${i}`;
+
+        // 设置内联样式
+        element.style.backgroundColor = i % 2 === 0 ? '#f0f0f0' : '#d0d0d0';
+        element.style.padding = '10px';
+        element.style.margin = '5px';
+        element.style.borderRadius = '5px';
+
+        // 动态添加属性
+        element.setAttribute('data-index', i);
+
+        // 绑定点击事件
+        element.addEventListener('click', function() {
+            alert(`You clicked on Element ${i}`);
+        });
+
+        // 插入图片
+        if (i % 5 === 0) {
+            const img = document.createElement('img');
+            img.src = 'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'; // 示例图片
+            img.alt = `Image for Element ${i}`;
+            element.appendChild(img);
+        }
+
+        // 插入链接
+        if (i % 3 === 0) {
+            const link = document.createElement('a');
+            link.href = 'https://moondust2024.github.io/web-benchmark/';
+            link.target = '_blank';
+            link.textContent = 'Visit Example';
+            element.appendChild(link);
+        }
+
+        // 插入其他 HTML 内容
+        if (i % 7 === 0) {
+            element.innerHTML += '<p>Additional content for this element.</p>';
+        }
+
+        // 将元素添加到文档片段
+        fragment.appendChild(element);
     }
+
+    // 将文档片段添加到容器
     container.appendChild(fragment);
 }
 
