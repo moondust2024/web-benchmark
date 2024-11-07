@@ -66,6 +66,11 @@
             display: none; /* 隐藏容器，避免影响布局 */
         }
 
+        #results div#demoscore{
+            font-size: 0.8em;
+            color: gray;
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 1.5em;
@@ -91,7 +96,7 @@
     </style>
 </head>
 <body>
-    <h1>CPU and DOM<br/> Performance Test</h1>
+    <h1>CPU and DOM<br/> Performance Test v0.11</h1>
     <button id="run-test">Run Performance Test</button>
     <div id="results">
         <div id="thread-count"></div>
@@ -101,6 +106,7 @@
         <div id="single-int-result"></div>
         <div id="multi-int-result"></div>
         <div id="score"></div>
+        <div id="demoscore">参考分数：手机8gen1:65(DOM:)  &nbsp;&nbsp; 电脑8845H:104(DOM:28) <br />请安装最新版浏览器，性能影响较大</div>
     </div>
     <div class="progress" id="progress"></div>
     <div id="container"></div>

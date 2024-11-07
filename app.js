@@ -60,7 +60,7 @@ function runTest() {
                                     multiThreadIntScore * 0.15 +
                                     domRenderScore * 0.25
                                 ).toFixed(2);
-                                updateScore(totalScore);
+                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ')');
                             });
                         });
                     });
