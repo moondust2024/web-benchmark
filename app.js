@@ -83,6 +83,9 @@ function runTest() {
                                             ).toFixed(2);
 
                                             updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ')');
+
+                                            var copyscoreDiv = document.getElementById('copyscore'); 
+                                            copyscoreDiv.style.display = 'inline-block';
                                         });
                                     });
                                 });

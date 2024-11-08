@@ -71,6 +71,10 @@
             color: gray;
         }
 
+        #copyscore{
+            display: none;
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 1.5em;
@@ -108,12 +112,31 @@
         <div id="single-aes-result"></div>
         <div id="multi-aes-result"></div>
         <div id="pi-result"></div>
-        <div id="score"></div>
-        <div id="demoscore">参考分数：手机8gen1:52(DOM:8.9, PI:2.3)<br />请确保安装了最新版浏览器，对性能影响较大</div>
+        <div id="score"></div><button type="button" id="copyscore" onclick="copyText()">Copy Score</button>
+        <div id="demoscore">Reference Score：8gen1:52(DOM:8.9, PI:2.3)</div>
     </div>
     <div class="progress" id="progress"></div>
     <div id="container"></div>
 
     <script src="app.js"></script>
+
+    <script>
+    function copyText() {
+        var div = document.getElementById('score');    
+        var input = document.createElement('input');    
+        input.value = div.textContent;
+        document.body.appendChild(input);    
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+
+        var progressDiv = document.getElementById('progress');
+        progressDiv.textContent = 'Copied to Clipboard';
+        
+        setTimeout(function() {
+            progressDiv.textContent = '';
+        }, 2000);
+    }
+    </script>
 </body>
 </html>
