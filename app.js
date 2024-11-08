@@ -17,7 +17,7 @@ function runTest() {
     clearPerformanceData();
 
     // 清空测试结果变量
-    let domRenderTime, singleThreadFloatTime, multiThreadFloatTime, singleThreadIntTime, multiThreadIntTime, singleThreadAESTime, multiThreadAESTime;
+    let domRenderTime, singleThreadFloatTime, multiThreadFloatTime, singleThreadIntTime, multiThreadIntTime, singleThreadAESTime, multiThreadAESTime, PITime;
 
     progressElement.textContent = 'Testing DOM Render...';
     setTimeout(() => {
@@ -55,26 +55,35 @@ function runTest() {
                                     runMultiThreadAESTest().then(time => {
                                         multiThreadAESTime = time;
                                         updateResult('Multi AES result', multiThreadAESTime);
-                                        progressElement.textContent = '';
+                                        progressElement.textContent = 'Testing PI...';
 
-                                        const domRenderScore = calculateScore(domRenderTime, 1600, 100);
-                                        const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
-                                        const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
-                                        const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
-                                        const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
-                                        const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
-                                        const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
+                                        runPITest().then(time => {
+                                            PITime = time;
+                                            updateResult('PI result', PITime);
+                                            progressElement.textContent = '';
 
-                                        const totalScore = (
-                                            singleThreadFloatScore * 0.15 +
-                                            multiThreadFloatScore * 0.1 +
-                                            singleThreadIntScore * 0.15 +
-                                            multiThreadIntScore * 0.1 +
-                                            singleThreadAESScore * 0.15 +
-                                            multiThreadAESScore * 0.1 +
-                                            domRenderScore * 0.25
-                                        ).toFixed(2);
-                                        updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ')');
+                                            const domRenderScore = calculateScore(domRenderTime, 1600, 100);
+                                            const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
+                                            const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
+                                            const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
+                                            const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
+                                            const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
+                                            const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
+                                            const PIScore = calculateScore(PITime, 1200, 100);
+
+                                            const totalScore = (
+                                                singleThreadFloatScore * 0.15 +
+                                                multiThreadFloatScore * 0.1 +
+                                                singleThreadIntScore * 0.15 +
+                                                multiThreadIntScore * 0.1 +
+                                                singleThreadAESScore * 0.15 +
+                                                multiThreadAESScore * 0.1 +
+                                                PIScore * 0.2 +
+                                                domRenderScore * 0.25
+                                            ).toFixed(2);
+
+                                            updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ')');
+                                        });
                                     });
                                 });
                             });
@@ -85,12 +94,25 @@ function runTest() {
     }, 200);
 }
 
+function runPITest() {
+    return new Promise((resolve) => {    
+        const startTime = performance.now();
+        const worker = new Worker('worker.js?t=${Date.now()}');
+        worker.postMessage({ start: 500, end: 1000, type: 'pi' });
+
+        worker.onmessage = (e) => {            
+            const endTime = performance.now();
+            resolve(endTime - startTime);
+            worker.terminate();
+        };
+    });
+}
+
 function runSingleThreadFloatTest() {
-    return new Promise((resolve) => {
-        
+    return new Promise((resolve) => {       
 
         const startTime = performance.now();
-        const worker = new Worker('worker.js');
+        const worker = new Worker('worker.js?t=${Date.now()}');
         worker.postMessage({ start: 0, end: 500000000, type: 'float' });
 
         worker.onmessage = (e) => {
@@ -104,7 +126,6 @@ function runSingleThreadFloatTest() {
 function runMultiThreadFloatTest() {
     return new Promise((resolve) => {
         
-
         const startTime = performance.now();
         const numWorkers = navigator.hardwareConcurrency || 4;
         const tasksPerWorker = 500000000 / numWorkers;
@@ -112,7 +133,7 @@ function runMultiThreadFloatTest() {
 
         const workers = [];
         for (let j = 0; j < numWorkers; j++) {
-            const worker = new Worker('worker.js');
+            const worker = new Worker('worker.js?t=${Date.now()}');
             workers.push(worker);
 
             worker.postMessage({ start: j * tasksPerWorker, end: (j + 1) * tasksPerWorker, type: 'float' });
@@ -133,9 +154,8 @@ function runMultiThreadFloatTest() {
 function runSingleThreadIntTest() {
     return new Promise((resolve) => {
         
-
         const startTime = performance.now();
-        const worker = new Worker('worker.js');
+        const worker = new Worker('worker.js?t=${Date.now()}');
         worker.postMessage({ start: 0, end: 500000000, type: 'int' });
 
         worker.onmessage = (e) => {
@@ -149,7 +169,6 @@ function runSingleThreadIntTest() {
 function runMultiThreadIntTest() {
     return new Promise((resolve) => {
         
-
         const startTime = performance.now();
         const numWorkers = navigator.hardwareConcurrency || 4;
         const tasksPerWorker = 500000000 / numWorkers;
@@ -157,7 +176,7 @@ function runMultiThreadIntTest() {
 
         const workers = [];
         for (let j = 0; j < numWorkers; j++) {
-            const worker = new Worker('worker.js');
+            const worker = new Worker('worker.js?t=${Date.now()}');
             workers.push(worker);
 
             worker.postMessage({ start: j * tasksPerWorker, end: (j + 1) * tasksPerWorker, type: 'int' });
@@ -178,7 +197,7 @@ function runMultiThreadIntTest() {
 function runSingleThreadAESTest() {
     return new Promise((resolve) => {
         const startTime = performance.now();
-        const worker = new Worker('worker.js');
+        const worker = new Worker('worker.js?t=${Date.now()}');
         worker.postMessage({ start: 0, end: 50000, type: 'AES' });
 
         worker.onmessage = (e) => {
@@ -198,7 +217,7 @@ function runMultiThreadAESTest() {
 
         const workers = [];
         for (let j = 0; j < numWorkers; j++) {
-            const worker = new Worker('worker.js');
+            const worker = new Worker('worker.js?t=${Date.now()}');
             workers.push(worker);
 
             worker.postMessage({ start: j * tasksPerWorker, end: (j + 1) * tasksPerWorker, type: 'AES' });
@@ -334,6 +353,7 @@ function clearResults() {
         'multi-int-result',
         'single-aes-result',
         'multi-aes-result',
+        'pi-result',
         'score'
     ];
 
