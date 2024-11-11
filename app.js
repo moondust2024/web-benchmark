@@ -75,7 +75,7 @@ function runTest() {
                                                 const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
                                                 const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
                                                 const PIScore = calculateScore(PITime, 1200, 100);
-                                                const RWScore = calculateScore(RWTime, 120, 100);
+                                                const RWScore = calculateScore(RWTime, 200, 100);
 
                                                 const totalScore = (
                                                     singleThreadFloatScore * 0.15 +
