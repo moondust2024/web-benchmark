@@ -19,10 +19,138 @@ self.onmessage = async function(e) {
         await loadDecimalJS();
 
         result = await testPI(start, end);
+    } else if (type === 'rw') {
+
+        result = await testReadWriteSpeed();
     }
 
     self.postMessage({ result, startTime });
 };
+
+const dbName = 'TestDB';
+const storeName = 'TestStore';
+const dbVersion = 1;
+const testDataSize = 50 * 1000 * 1000;
+const testCount = 5;
+
+let db;
+
+function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(dbName, dbVersion);
+                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve();
+                };
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(storeName)) {
+                        db.createObjectStore(storeName);
+                    }
+                };
+            });
+}
+
+function bytesToMB(bytes) {
+            return (bytes / (1000 * 1000)).toFixed(2);
+}
+
+async function performSingleTest() {
+            // 测试写入速度
+            const writeStartTime = performance.now();
+            const testData = "a".repeat(testDataSize); // 生成数据
+
+            const writeTransaction = db.transaction([storeName], 'readwrite');
+            const writeStore = writeTransaction.objectStore(storeName);
+            const writeRequest = writeStore.put(testData, 'testData');
+
+            let writeSuccess = false;
+            writeRequest.onsuccess = () => {
+                writeSuccess = true;
+            };
+            writeRequest.onerror = (event) => {
+                console.error('写入失败:', event.target.error);
+            };
+
+            await new Promise((resolve) => {
+                writeTransaction.oncomplete = resolve;
+            });
+
+            const writeEndTime = performance.now();
+            if (!writeSuccess) {
+                return { writeTime: -1, readTime: -1 };
+            }
+
+            // 测试读取速度
+            const readStartTime = performance.now();
+
+            const readTransaction = db.transaction([storeName], 'readonly');
+            const readStore = readTransaction.objectStore(storeName);
+            const readRequest = readStore.get('testData');
+
+            let readSuccess = false;
+            readRequest.onsuccess = (event) => {
+                const testData = event.target.result;
+                if (testData) {
+                    readSuccess = true;
+                }
+            };
+            readRequest.onerror = (event) => {
+                console.error('读取失败:', event.target.error);
+            };
+
+            await new Promise((resolve) => {
+                readTransaction.oncomplete = resolve;
+            });
+
+            const readEndTime = performance.now();
+            if (!readSuccess) {
+                return { writeTime: -1, readTime: -1 };
+            }
+
+            return { writeTime: writeEndTime - writeStartTime, readTime: readEndTime - readStartTime };
+}
+
+async function testReadWriteSpeed() {
+            await openDatabase();
+
+            // 预热
+            for (let i = 0; i < 2; i++) {
+                await performSingleTest();
+            }
+
+            let totalWriteTime = 0;
+            let totalReadTime = 0;
+
+            for (let i = 0; i < testCount; i++) {
+                const { writeTime, readTime } = await performSingleTest();
+                if (writeTime >= 0 && readTime >= 0) {
+                    totalWriteTime += writeTime;
+                    totalReadTime += readTime;
+                } else {
+                    console.error('测试失败，跳过本次结果');
+                }
+            }
+
+            const averageWriteTime = totalWriteTime / testCount;
+            const averageReadTime = totalReadTime / testCount;
+            
+            await clearTestData();
+
+            return averageWriteTime + averageReadTime;
+}
+
+async function clearTestData() {
+            await openDatabase();
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const request = store.delete('testData');
+            
+            request.onerror = (event) => {
+                console.error('清理失败:', event.target.error);
+            };
+}
 
 async function loadCryptoJS() {
     return new Promise((resolve, reject) => {

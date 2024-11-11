@@ -17,7 +17,7 @@ function runTest() {
     clearPerformanceData();
 
     // 清空测试结果变量
-    let domRenderTime, singleThreadFloatTime, multiThreadFloatTime, singleThreadIntTime, multiThreadIntTime, singleThreadAESTime, multiThreadAESTime, PITime;
+    let domRenderTime, singleThreadFloatTime, multiThreadFloatTime, singleThreadIntTime, multiThreadIntTime, singleThreadAESTime, multiThreadAESTime, PITime, RWTime;
 
     progressElement.textContent = 'Testing DOM Render...';
     setTimeout(() => {
@@ -60,32 +60,40 @@ function runTest() {
                                         runPITest().then(time => {
                                             PITime = time;
                                             updateResult('PI result', PITime);
-                                            progressElement.textContent = '';
+                                            progressElement.textContent = 'Testing Read/Write...';
 
-                                            const domRenderScore = calculateScore(domRenderTime, 1600, 100);
-                                            const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
-                                            const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
-                                            const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
-                                            const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
-                                            const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
-                                            const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
-                                            const PIScore = calculateScore(PITime, 1200, 100);
+                                            runRWTest().then(time => {
+                                                RWTime = time;
+                                                updateResult('Read Write result', RWTime);
+                                                progressElement.textContent = '';
 
-                                            const totalScore = (
-                                                singleThreadFloatScore * 0.15 +
-                                                multiThreadFloatScore * 0.1 +
-                                                singleThreadIntScore * 0.15 +
-                                                multiThreadIntScore * 0.1 +
-                                                singleThreadAESScore * 0.15 +
-                                                multiThreadAESScore * 0.1 +
-                                                PIScore * 0.2 +
-                                                domRenderScore * 0.25
-                                            ).toFixed(2);
+                                                const domRenderScore = calculateScore(domRenderTime, 1600, 100);
+                                                const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
+                                                const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
+                                                const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
+                                                const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
+                                                const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
+                                                const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
+                                                const PIScore = calculateScore(PITime, 1200, 100);
+                                                const RWScore = calculateScore(RWTime, 120, 100);
 
-                                            updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ')');
+                                                const totalScore = (
+                                                    singleThreadFloatScore * 0.15 +
+                                                    multiThreadFloatScore * 0.1 +
+                                                    singleThreadIntScore * 0.15 +
+                                                    multiThreadIntScore * 0.1 +
+                                                    singleThreadAESScore * 0.15 +
+                                                    multiThreadAESScore * 0.1 +
+                                                    PIScore * 0.2 +
+                                                    domRenderScore * 0.25 +
+                                                    RWScore * 0.15
+                                                ).toFixed(2);
 
-                                            var copyscoreDiv = document.getElementById('copyscore'); 
-                                            copyscoreDiv.style.display = 'inline-block';
+                                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
+
+                                                var copyscoreDiv = document.getElementById('copyscore'); 
+                                                copyscoreDiv.style.display = 'inline-block';
+                                            });
                                         });
                                     });
                                 });
@@ -95,6 +103,18 @@ function runTest() {
                 });
             });
     }, 200);
+}
+
+function runRWTest() {
+    return new Promise((resolve) => {    
+        const worker = new Worker('worker.js?t=${Date.now()}');
+        worker.postMessage({ start: 0, end: 50, type: 'rw' });
+
+        worker.onmessage = (e) => {            
+            resolve(e.data.result);
+            worker.terminate();
+        };
+    });
 }
 
 function runPITest() {
