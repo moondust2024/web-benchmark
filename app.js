@@ -372,8 +372,8 @@ function updateScore(score) {
 }
 
 function clearResults() {    
-    errorMessage.style.display = 'none';
-    successMessage.style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
     
     const resultIds = [
         'dom-render-result',

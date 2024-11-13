@@ -184,13 +184,9 @@
     <div class="progress" id="progress"></div>
     <div id="container"></div>
 
-    <script src="app.js?v=20241113"></script>    
+    <script src="app.js?v=2024111302"></script>    
     <script src="loadcpu.js"></script>
-    <script>     
-    const cpumodel = document.getElementById('model').value;
-                const score = document.getElementById('floatscore').innerHTML;
-                const scoretext = document.getElementById('score').innerHTML;
-                
+    <script>                     
 function loadScript(url, callback) {
   const script = document.createElement('script');
   script.src = url;
@@ -203,12 +199,12 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYndzdWdvYWF0ZXJnbG9lbmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTc0MjIsImV4cCI6MjA0Njk3MzQyMn0.fvMKNXkFPCvdjLZsQ3VHOfIog3uaW6mfJ5KuVoD-lKQ';
     const client  = supabase.createClient(supabaseUrl, supabaseKey);
     
+  async function saveScore() {
   const saveButton = document.getElementById('saveButton');
     const loadingIndicator = document.getElementById('loadingIndicator');
   const successMessage = document.getElementById('successMessage');
   const errorMessage = document.getElementById('errorMessage');
-
-  async function saveScore() {
+  
     loadingIndicator.style.display = 'block';
     saveButton.disabled = true;
     successMessage.style.display = 'none';
@@ -217,7 +213,7 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
                 const { error } = await client
                     .from('CPURank')
                     .insert(
-                    { cpumodel: cpumodel, score: parseFloat(score) , scoretext: scoretext }
+                    { cpumodel: document.getElementById('model').value, score: parseFloat(document.getElementById('floatscore').innerHTML) , scoretext: document.getElementById('score').innerHTML }
                     );
 
                 if (error) {
