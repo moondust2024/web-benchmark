@@ -67,7 +67,7 @@ function runTest() {
                                                 updateResult('Read Write result', RWTime);
                                                 progressElement.textContent = '';
 
-                                                const domRenderScore = calculateScore(domRenderTime, 1600, 100);
+                                                const domRenderScore = calculateScore(domRenderTime, 1500, 100);
                                                 const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
                                                 const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
                                                 const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
@@ -85,13 +85,13 @@ function runTest() {
                                                     singleThreadAESScore * 0.15 +
                                                     multiThreadAESScore * 0.1 +
                                                     PIScore * 0.2 +
-                                                    domRenderScore * 0.25 +
+                                                    domRenderScore * 0.2 +
                                                     RWScore * 0.15
                                                 ).toFixed(2);
                                                 
                                                 document.getElementById('floatscore').innerHTML = totalScore;
 
-                                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
+                                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.2).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
 
                                                 var submitscoreDivs = document.getElementsByClassName('submitscore');
                                                 for (var i = 0; i < submitscoreDivs.length; i++) {
@@ -371,7 +371,10 @@ function updateScore(score) {
     }
 }
 
-function clearResults() {
+function clearResults() {    
+    errorMessage.style.display = 'none';
+    successMessage.style.display = 'none';
+    
     const resultIds = [
         'dom-render-result',
         'single-float-result',
@@ -381,6 +384,7 @@ function clearResults() {
         'single-aes-result',
         'multi-aes-result',
         'pi-result',
+        'read-write-result',
         'score'
     ];
 

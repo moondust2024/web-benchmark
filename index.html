@@ -119,6 +119,15 @@
             display: none;
         }
 
+        .loading {
+            display: none;
+        }
+        
+        .success, .error {
+            display: none;
+            margin-top: 10px;
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 1.5em;
@@ -164,15 +173,24 @@
         <select class="submitscore" id="model">
             <option value="Others">Please select a model</option>
         </select>
-        <button type="button" class="submitscore" onclick="saveScore()">Submit Score</button>
+        <button type="button" class="submitscore" id="saveButton" onclick="saveScore()">Submit Score</button>
+        <br/>
+        <div class="loading" id="loadingIndicator">Saving...</div>
+        <div class="success" id="successMessage">Score saved successfully!</div>
+        <div class="error" id="errorMessage">Error saving score.</div>
+        <br/>
         <div id="demoscore">Reference Score：8gen1:55(DOM:8.9, PI:2.3, R/W:3.2)</div>
     </div>
     <div class="progress" id="progress"></div>
     <div id="container"></div>
 
-    <script src="app.js"></script>    
+    <script src="app.js?v=20241113"></script>    
     <script src="loadcpu.js"></script>
-    <script>    
+    <script>     
+    const cpumodel = document.getElementById('model').value;
+                const score = document.getElementById('floatscore').innerHTML;
+                const scoretext = document.getElementById('score').innerHTML;
+                
 function loadScript(url, callback) {
   const script = document.createElement('script');
   script.src = url;
@@ -184,11 +202,17 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
   const supabaseUrl = 'https://skbwsugoaatergloenlq.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYndzdWdvYWF0ZXJnbG9lbmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTc0MjIsImV4cCI6MjA0Njk3MzQyMn0.fvMKNXkFPCvdjLZsQ3VHOfIog3uaW6mfJ5KuVoD-lKQ';
     const client  = supabase.createClient(supabaseUrl, supabaseKey);
+    
+  const saveButton = document.getElementById('saveButton');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+  const successMessage = document.getElementById('successMessage');
+  const errorMessage = document.getElementById('errorMessage');
 
   async function saveScore() {
-                const cpumodel = document.getElementById('model').value;
-                const score = document.getElementById('floatscore').innerHTML;
-                const scoretext = document.getElementById('score').innerHTML;
+    loadingIndicator.style.display = 'block';
+    saveButton.disabled = true;
+    successMessage.style.display = 'none';
+    errorMessage.style.display = 'none';
 
                 const { error } = await client
                     .from('CPURank')
@@ -197,10 +221,14 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
                     );
 
                 if (error) {
+                    errorMessage.style.display = 'block';
                     console.error('Error saving score:', error); 
                 } else {
+                    successMessage.style.display = 'block';
                     console.log('Score saved');
                 }
+                
+      loadingIndicator.style.display = 'none';
     }
 
   window.saveScore = saveScore;
