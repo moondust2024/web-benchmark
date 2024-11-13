@@ -171,9 +171,32 @@
     <div id="container"></div>
 
     <script src="app.js"></script>    
-    <script src="Supabase.js?v=2" type="module"></script>
     <script src="loadcpu.js"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>    
+    const supabaseUrl = 'https://skbwsugoaatergloenlq.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYndzdWdvYWF0ZXJnbG9lbmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTc0MjIsImV4cCI6MjA0Njk3MzQyMn0.fvMKNXkFPCvdjLZsQ3VHOfIog3uaW6mfJ5KuVoD-lKQ';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    async function saveScore() {
+                const cpumodel = document.getElementById('model').value;
+                const score = document.getElementById('floatscore').value;
+                const scoretext = document.getElementById('score').value;
+
+                const { data, error } = await supabase
+                    .from('CPURank')
+                    .insert(
+                    { id: 'id', cpumodel: cpumodel, score: parseFloat(score) , scoretext: scoretext }
+                    );
+
+                if (error) {
+                    console.error('Error saving score:', error); 
+                } else {
+                    console.log('Score saved:', data);
+                }
+    }
+    
+
     function createCircle() {
         const circles = document.querySelector('.circles');
 
