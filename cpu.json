@@ -1,0 +1,39 @@
+{
+  "CPUs": [         
+        "Others",
+  
+        "Kirin 990",
+        "Kirin 990 5G",
+        "Kirin 9000",
+        "Kirin 9000E",
+        "Kirin 9000S",  
+      
+        "A13",
+        "A14",
+        "A15",
+        "A16",
+        "A17",
+        "A18",
+        
+        "Density 9000",
+        "Density 9000+",
+        "Density 9200",
+        "Density 9200+",
+        "Density 9300",
+        "Density 9300+",
+        "Density 9400",
+
+        "Snapdragon 7 Gen3",
+        "Snapdragon 7+ Gen3",
+        "Snapdragon 7s Gen3",
+        "Snapdragon 8s Gen3",
+        "Snapdragon 865",
+        "Snapdragon 870",
+        "Snapdragon 888",
+        "Snapdragon 8 Gen1",
+        "Snapdragon 8+ Gen1",
+        "Snapdragon 8 Gen2",
+        "Snapdragon 8 Gen3",
+        "Snapdragon 8 Elite"    
+  ]
+}

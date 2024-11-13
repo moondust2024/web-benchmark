@@ -107,10 +107,17 @@
             color: gray;
         }
 
-        #copyscore{
+        .submitscore{
             display: none;
         }
+
+        #model{
+            padding: 10px 20px;
+        }
         
+        #floatscore{
+            display: none;
+        }
 
         @media (max-width: 600px) {
             h1 {
@@ -138,7 +145,7 @@
 </head>
 <body>
     <div class="circles"></div>
-    <h1>CPU Performance Test v0.15</h1>
+    <h1>CPU Performance Test v0.16</h1>
     <button id="run-test">Run Performance Test</button>
     <div id="results">
         <div id="thread-count"></div>
@@ -151,32 +158,22 @@
         <div id="multi-aes-result"></div>
         <div id="pi-result"></div>
         <div id="read-write-result"></div>
-        <div id="score"></div><button type="button" id="copyscore" onclick="copyText()">Copy Score</button>
+        <div id="score"></div>
+        <div id="floatscore"></div>
+        <label class="submitscore" for="model">CPU:</label>
+        <select class="submitscore" id="model">
+            <option value="">Please select a model</option>
+        </select>
+        <button type="button" class="submitscore" onclick="saveScore()">Submit Score</button>
         <div id="demoscore">Reference Score：8gen1:55(DOM:8.9, PI:2.3, R/W:3.2)</div>
     </div>
     <div class="progress" id="progress"></div>
     <div id="container"></div>
 
-    <script src="app.js"></script>
-
+    <script src="app.js"></script>    
+    <script src="Supabase.js" type="module"></script>
+    <script src="loadcpu.js"></script>
     <script>
-    function copyText() {
-        var div = document.getElementById('score');    
-        var input = document.createElement('input');    
-        input.value = div.textContent;
-        document.body.appendChild(input);    
-        input.select();
-        document.execCommand('copy');
-        document.body.removeChild(input);
-
-        var progressDiv = document.getElementById('progress');
-        progressDiv.textContent = 'Copied to Clipboard';
-        
-        setTimeout(function() {
-            progressDiv.textContent = '';
-        }, 2000);
-    }
-
     function createCircle() {
         const circles = document.querySelector('.circles');
 

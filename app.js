@@ -88,11 +88,15 @@ function runTest() {
                                                     domRenderScore * 0.25 +
                                                     RWScore * 0.15
                                                 ).toFixed(2);
+                                                
+                                                document.getElementById('floatscore').innerHTML = totalScore;
 
                                                 updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.25).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
 
-                                                var copyscoreDiv = document.getElementById('copyscore'); 
-                                                copyscoreDiv.style.display = 'inline-block';
+                                                var submitscoreDivs = document.getElementsByClassName('submitscore');
+                                                for (var i = 0; i < submitscoreDivs.length; i++) {
+                                                    submitscoreDivs[i].style.display = 'inline-block';
+                                                }
                                             });
                                         });
                                     });
