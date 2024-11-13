@@ -25,7 +25,7 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
             );
 
         if (error) {
-            console.error('Error saving score:', error);
+            console.error('Error saving score:', error); 
         } else {
             console.log('Score saved:', data);
         }
