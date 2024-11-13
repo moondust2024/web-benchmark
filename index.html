@@ -172,21 +172,28 @@
 
     <script src="app.js"></script>    
     <script src="loadcpu.js"></script>
-    <script src="supabase.js"></script>
     <script>    
-    const supabaseUrl = 'https://skbwsugoaatergloenlq.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYndzdWdvYWF0ZXJnbG9lbmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTc0MjIsImV4cCI6MjA0Njk3MzQyMn0.fvMKNXkFPCvdjLZsQ3VHOfIog3uaW6mfJ5KuVoD-lKQ';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+function loadScript(url, callback) {
+  const script = document.createElement('script');
+  script.src = url;
+  script.onload = callback;
+  document.head.appendChild(script);
+}
 
-    async function saveScore() {
+loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {  
+  const supabaseUrl = 'https://skbwsugoaatergloenlq.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYndzdWdvYWF0ZXJnbG9lbmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTc0MjIsImV4cCI6MjA0Njk3MzQyMn0.fvMKNXkFPCvdjLZsQ3VHOfIog3uaW6mfJ5KuVoD-lKQ';
+    const client  = supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function saveScore() {
                 const cpumodel = document.getElementById('model').value;
                 const score = document.getElementById('floatscore').value;
                 const scoretext = document.getElementById('score').value;
 
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('CPURank')
                     .insert(
-                    { id: 'id', cpumodel: cpumodel, score: parseFloat(score) , scoretext: scoretext }
+                    { cpumodel: cpumodel, score: parseFloat(score) , scoretext: scoretext }
                     );
 
                 if (error) {
@@ -195,8 +202,12 @@
                     console.log('Score saved:', data);
                 }
     }
-    
 
+  window.saveScore = saveScore;
+});    
+    </script>
+        
+    <script> 
     function createCircle() {
         const circles = document.querySelector('.circles');
 
