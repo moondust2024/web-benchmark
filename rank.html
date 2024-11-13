@@ -103,13 +103,24 @@
         loadingElement.style.display = 'none';
 
         data.forEach(item => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <span class="cpumodel">${item.cpumodel}</span>
-            <span class="score">${item.score}</span>
-            <span class="scoretext">${item.scoretext}</span>
-          `;
-          cpuRankList.appendChild(li);
+            const li = document.createElement('li');
+            const cpumodelSpan = document.createElement('span');
+            cpumodelSpan.className = 'cpumodel';
+            cpumodelSpan.textContent = item.cpumodel;
+
+            const scoreSpan = document.createElement('span');
+            scoreSpan.className = 'score';
+            scoreSpan.textContent = item.score;
+
+            const scoretextSpan = document.createElement('span');
+            scoretextSpan.className = 'scoretext';
+            scoretextSpan.textContent = item.scoretext;
+
+            li.appendChild(cpumodelSpan);
+            li.appendChild(scoreSpan);
+            li.appendChild(scoretextSpan);
+
+            cpuRankList.appendChild(li);
         });
       } catch (error) {
         console.error('Error:', error);
