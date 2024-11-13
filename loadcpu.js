@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
     function populateModels(models) {
       const modelSelect = document.getElementById('model');
-      modelSelect.innerHTML = '<option value="">Please select a model</option>';
+      modelSelect.innerHTML = '<option value="Others">Please select a model</option>';
       models.forEach(model => {
         const option = document.createElement('option');
         option.value = model;
