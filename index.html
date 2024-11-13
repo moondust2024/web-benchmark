@@ -187,10 +187,10 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
 
   async function saveScore() {
                 const cpumodel = document.getElementById('model').value;
-                const score = document.getElementById('floatscore').value;
-                const scoretext = document.getElementById('score').value;
+                const score = document.getElementById('floatscore').innerHTML;
+                const scoretext = document.getElementById('score').innerHTML;
 
-                const { data, error } = await client
+                const { error } = await client
                     .from('CPURank')
                     .insert(
                     { cpumodel: cpumodel, score: parseFloat(score) , scoretext: scoretext }
@@ -199,7 +199,7 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
                 if (error) {
                     console.error('Error saving score:', error); 
                 } else {
-                    console.log('Score saved:', data);
+                    console.log('Score saved');
                 }
     }
 
