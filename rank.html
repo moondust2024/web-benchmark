@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPURank Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+        font-size: 12px;
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li:nth-child(odd) {
+      background-color: #e4eeff;
+    }
+    .cpumodel, .score {
+        flex: 1;
+        text-align: left;
+        }
+        .scoretext {
+        flex: 2;
+        text-align: left;
+        }
+    .loading {
+      text-align: center;
+      color: #6c757d;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rank List</h1>
+    <a href="index.html">Back to Index</a>
+    <div id="loading" class="loading">Loading data...</div>
+    <ul id="cpuRankList"></ul>
+  </div>
+
+  <script>                     
+    function loadScript(url, callback) {
+      const script = document.createElement('script');
+      script.src = url;
+      script.onload = callback;
+      document.head.appendChild(script);
+    }
+    
+    loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {  
+      const supabaseUrl = 'https://skbwsugoaatergloenlq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYndzdWdvYWF0ZXJnbG9lbmxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTc0MjIsImV4cCI6MjA0Njk3MzQyMn0.fvMKNXkFPCvdjLZsQ3VHOfIog3uaW6mfJ5KuVoD-lKQ';
+        const client  = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function loadCPURankData() {
+      try {
+        const loadingElement = document.getElementById('loading');
+        loadingElement.style.display = 'block';
+        
+        const { data, error } = await client
+          .from('CPURank')
+          .select('*')
+          .order('score', { ascending: false });
+
+        if (error) {
+          console.error('Error loading data:', error);
+          loadingElement.innerText = 'Error loading data. Please try again.';
+          return;
+        }
+
+        const cpuRankList = document.getElementById('cpuRankList');
+        cpuRankList.innerHTML = '';
+        loadingElement.style.display = 'none';
+
+        data.forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="cpumodel">${item.cpumodel}</span>
+            <span class="score">${item.score}</span>
+            <span class="scoretext">${item.scoretext}</span>
+          `;
+          cpuRankList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+    
+
+    window.addEventListener('load', loadCPURankData);
+});
+  </script>
+</body>
+</html>
