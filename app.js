@@ -356,7 +356,7 @@ function updateResult(testType, time) {
     const resultId = testType.toLowerCase().replace(/ /g, '-').replace(/\./g, '');
     const resultElement = document.getElementById(resultId);
     if (resultElement) {
-        resultElement.innerHTML = `${testType}: Time taken: ${time.toFixed(2)} ms`;
+        resultElement.innerHTML = `${testType}: Time: ${time.toFixed(2)} ms`;
     } else {
         console.error(`Element with ID '${resultId}' not found.`);
     }
