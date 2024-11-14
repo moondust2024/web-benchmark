@@ -105,6 +105,8 @@
         #results div#demoscore{
             font-size: 0.8em;
             color: gray;
+            line-height: 1.5em;
+            padding: 5px 15px;
         }
 
         .submitscore{
@@ -154,7 +156,7 @@
 </head>
 <body>
     <div class="circles"></div>
-    <h1>CPU Performance Test v0.17</h1>
+    <h1>CPU Performance Test v0.18</h1>
     <button id="run-test">Run Performance Test</button>
     <div id="results">
         <div id="thread-count"></div>
@@ -179,7 +181,8 @@
         <div class="success" id="successMessage">Score saved successfully!</div>
         <div class="error" id="errorMessage">Error saving score.</div>
         <br/>
-        <div id="demoscore">Reference Score：8gen1:52(DOM:6.6, PI:2.3, R/W:5.1)<br/>Rank List:<a href="rank.html">Click Here</a></div>
+        <div id="demoscore"><h2>If you are using the Android system, for the best results, please test with a browser based on the Chromium engine, such as Chrome or Edge.</h2>
+            Reference Score：8gen1:52(DOM:6.6, PI:2.3, R/W:5.1)<br/>Rank List: <a href="rank.html">Click Here</a></div>
     </div>
     <div class="progress" id="progress"></div>
     <div id="container"></div>
