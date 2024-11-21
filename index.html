@@ -156,7 +156,7 @@
 </head>
 <body>
     <div class="circles"></div>
-    <h1>CPU Performance Test v0.18</h1>
+    <h1>CPU Performance Test v0.19</h1>
     <button id="run-test">Run Performance Test</button>
     <div id="results">
         <div id="thread-count"></div>
@@ -181,7 +181,9 @@
         <div class="success" id="successMessage">Score saved successfully!</div>
         <div class="error" id="errorMessage">Error saving score.</div>
         <br/>
-        <div id="demoscore"><h2>If you are using the Android system, for the best results, please test with a browser based on the Chromium engine, such as Chrome or Edge.</h2>
+        <div id="demoscore">
+            <p id="browsertip"></p>
+            <h2>If you are using the Android system, for the best results, please test with a browser based on the Chromium engine, such as Chrome or Edge.</h2>
             Reference Score：8gen1:52(DOM:6.6, PI:2.3, R/W:5.1)<br/>Rank List: <a href="rank.html">Click Here</a></div>
     </div>
     <div class="progress" id="progress"></div>
@@ -266,6 +268,65 @@ loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', () => {
     for (let i = 0; i < 10; i++) {
         createCircle();
     }
+
+    function getBrowserInfo() {
+        const userAgent = navigator.userAgent;
+        let browserName = "Unknown";
+        let browserVersion = "Unknown";
+        let engine = "Unknown";
+
+        if (userAgent.indexOf("Firefox") > -1) {
+            browserName = "Firefox";
+            browserVersion = userAgent.substring(userAgent.indexOf("Firefox") + 8);
+            engine = "Gecko";
+        } else if (userAgent.indexOf("Chrome") > -1) {
+            browserName = "Chrome";
+            browserVersion = userAgent.substring(userAgent.indexOf("Chrome") + 7, userAgent.indexOf("Safari") - 1);
+            engine = "Blink";
+        } else if (userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") === -1) {
+            browserName = "Safari";
+            browserVersion = userAgent.substring(userAgent.indexOf("Version") + 8);
+            engine = "WebKit";
+        } else if (userAgent.indexOf("Trident") > -1) {
+            browserName = "Internet Explorer";
+            browserVersion = userAgent.substring(userAgent.indexOf("rv:") + 3);
+            engine = "Trident";
+        } else if (userAgent.indexOf("Edge") > -1) {
+            browserName = "Edge";
+            browserVersion = userAgent.substring(userAgent.indexOf("Edge") + 5);
+            engine = "Blink"; // Edge (Chromium) uses Blink
+        }
+
+        return { browserName, browserVersion, engine };
+    }
+
+    function checkBrowser() {
+        const browserInfo = getBrowserInfo();
+        const requiredVersion = "130.0.0.0";
+        const currentVersion = browserInfo.browserVersion;
+
+        if (browserInfo.engine !== "Blink" && browserInfo.engine !== "WebKit") {
+            document.getElementById("browsertip").innerHTML = "Your Browser is " + browserInfo.browserName + ", For the best performance, we recommend using Chrome or Edge.";
+        } else if ((browserInfo.browserName === "Chrome" || browserInfo.browserName === "Edge") && compareVersions(currentVersion, requiredVersion) < 0) {
+            document.getElementById("browsertip").innerHTML = `Your ${browserInfo.browserName} browser version is too low. Please update to version ${requiredVersion} or higher for the best performance.`;
+        }
+    }
+
+    function compareVersions(version1, version2) {
+        const v1Parts = version1.split('.').map(Number);
+        const v2Parts = version2.split('.').map(Number);
+
+        for (let i = 0; i < 4; i++) {
+            if (v1Parts[i] < v2Parts[i]) return -1;
+            if (v1Parts[i] > v2Parts[i]) return 1;
+        }
+        return 0;
+    }
+
+    // Call the check function
+    checkBrowser();
     </script>
+
+    
 </body>
 </html>
