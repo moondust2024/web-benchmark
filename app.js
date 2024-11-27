@@ -79,19 +79,19 @@ function runTest() {
 
                                                 const totalScore = (
                                                     singleThreadFloatScore * 0.15 +
-                                                    multiThreadFloatScore * 0.1 +
+                                                    multiThreadFloatScore * 0.2 +
                                                     singleThreadIntScore * 0.15 +
-                                                    multiThreadIntScore * 0.1 +
+                                                    multiThreadIntScore * 0.2 +
                                                     singleThreadAESScore * 0.15 +
-                                                    multiThreadAESScore * 0.1 +
-                                                    PIScore * 0.2 +
-                                                    domRenderScore * 0.2 +
+                                                    multiThreadAESScore * 0.2 +
+                                                    PIScore * 0.15 +
+                                                    domRenderScore * 0.3 +
                                                     RWScore * 0.15
                                                 ).toFixed(2);
                                                 
                                                 document.getElementById('floatscore').innerHTML = totalScore;
 
-                                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.2).toFixed(2) + ', PI:' + (PIScore * 0.2).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
+                                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.3).toFixed(2) + ', PI:' + (PIScore * 0.15).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
 
                                                 var submitscoreDivs = document.getElementsByClassName('submitscore');
                                                 for (var i = 0; i < submitscoreDivs.length; i++) {

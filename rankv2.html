@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CPU Performance Test Ranking List</title>
+  <title>CPU Performance Test Ranking List v2</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -63,9 +63,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>Ranking List<a class="backurl" href="rankv2.html">New ranking</a></h1>
+    <h1>Ranking List<a class="backurl" href="rank.html">Old ranking</a></h1>
     <p>If your PI score is high, it usually indicates a desktop-level CPU. The DOM score for iPhones tends to be higher.</p>
-    <a class="backurl" href="index.html">Back to Index</a><br/>
+    <a class="backurl" href="index.html">Back to Index</a> 
+    <br/>
     <div id="loading" class="loading">Loading data...</div>
     <ul id="cpuRankList"></ul>
   </div>
@@ -89,7 +90,7 @@
         loadingElement.style.display = 'block';
         
         const { data, error } = await client
-          .from('CPURank')
+          .from('CPURankv2')
           .select('*')
           .order('score', { ascending: false });
 
