@@ -2,30 +2,47 @@ self.onmessage = async function(e) {
     const { start, end, type } = e.data;
     const startTime = performance.now();    
 
-    let result;
-    if (type === 'float') {
-        result = await computeLightFloatTask(start, end);
-    } else if (type === 'int') {
-        result = await computeHeavyIntTask(start, end);
-    } else if (type === 'AES') {
+    try{
+        let result;
+        if (type === 'float') {
+            result = await computeLightFloatTask(start, end);
+        } else if (type === 'int') {
+            result = await computeHeavyIntTask(start, end);
+        } else if (type === 'AES') {
+            await loadCryptoJS();
+            result = await testEncryption(start, end);
+        } else if (type === 'pi') {
+            await loadDecimalJS();
+            result = await testPI(start, end);
+        } else if (type === 'rw') {
+            result = await testReadWriteSpeed();
+        } else if (type === 'matrix') {
+            result = await testMatrixMultiplication(start, end);
+        } else if (type === 'fibonacci') {
+            result = await testRecursiveFibonacci(start, end);
+        } else if (type === 'sorting') {
+            result = await testSortingAlgorithm(start, end);
+        }
 
-        // 动态加载 crypto-js
-        await loadCryptoJS();
-
-        result = await testEncryption(start, end);
-    } else if (type === 'pi') {
-
-        // 动态加载 decimal-js
-        await loadDecimalJS();
-
-        result = await testPI(start, end);
-    } else if (type === 'rw') {
-
-        result = await testReadWriteSpeed();
+        self.postMessage({ result, startTime });
+    }
+    catch (taskError) {
+        console.error(`Error in task ${type}:`, taskError);
+        self.postMessage({ 
+            error: {
+                message: taskError.message,
+                stack: taskError.stack,
+                type: type
+            },
+            startTime 
+        });
     }
 
-    self.postMessage({ result, startTime });
 };
+
+self.addEventListener('error', (event) => {
+    console.error('Uncaught error in worker:', event.error);
+});
 
 const dbName = 'TestDB';
 const storeName = 'TestStore';
@@ -245,4 +262,55 @@ function decrypt(encryptedData, key, iv) {
         const decrypted = CryptoJS.AES.decrypt(encryptedData, key, { iv: iv });
         resolve(CryptoJS.enc.Utf8.stringify(decrypted));
     });
+}
+
+async function testMatrixMultiplication(start, end) {
+    const size = Math.floor(Math.sqrt(end - start));
+    const matrix1 = new Array(size).fill(0).map(() => 
+        new Array(size).fill(0).map(() => Math.random()));
+    const matrix2 = new Array(size).fill(0).map(() => 
+        new Array(size).fill(0).map(() => Math.random()));
+    
+    const result = new Array(size).fill(0).map(() => new Array(size).fill(0));
+    
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            for (let k = 0; k < size; k++) {
+                result[i][j] += matrix1[i][k] * matrix2[k][j];
+            }
+        }
+    }
+    
+    return result;
+}
+
+async function testRecursiveFibonacci(start, end) {
+    function fibonacci(n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+    
+    let sum = 0;
+    for (let i = start; i < end; i++) {
+        sum += fibonacci(i % 20);
+    }
+    return sum;
+}
+
+async function testSortingAlgorithm(start, end) {
+    const size = end - start;
+    const arr = Array.from({length: size}, () => Math.random());
+    
+    function quickSort(arr) {
+        if (arr.length <= 1) return arr;
+        
+        const pivot = arr[Math.floor(arr.length / 2)];
+        const left = arr.filter(x => x < pivot);
+        const middle = arr.filter(x => x === pivot);
+        const right = arr.filter(x => x > pivot);
+        
+        return [...quickSort(left), ...middle, ...quickSort(right)];
+    }
+    
+    return quickSort(arr).length;
 }

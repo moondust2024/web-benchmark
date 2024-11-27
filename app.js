@@ -17,7 +17,7 @@ function runTest() {
     clearPerformanceData();
 
     // 清空测试结果变量
-    let domRenderTime, singleThreadFloatTime, multiThreadFloatTime, singleThreadIntTime, multiThreadIntTime, singleThreadAESTime, multiThreadAESTime, PITime, RWTime;
+    let domRenderTime, singleThreadFloatTime, multiThreadFloatTime, singleThreadIntTime, multiThreadIntTime, singleThreadAESTime, multiThreadAESTime, PITime, RWTime, matrixTime, fibonacciTime, sortingTime;
 
     progressElement.textContent = 'Testing DOM Render...';
     setTimeout(() => {
@@ -65,38 +65,62 @@ function runTest() {
                                             runRWTest().then(time => {
                                                 RWTime = time;
                                                 updateResult('Read Write result', RWTime);
-                                                progressElement.textContent = '';
+                                                progressElement.textContent = 'Testing Matrix Operations';
 
-                                                const domRenderScore = calculateScore(domRenderTime, 1500, 100);
-                                                const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
-                                                const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
-                                                const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
-                                                const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
-                                                const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
-                                                const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
-                                                const PIScore = calculateScore(PITime, 1200, 100);
-                                                const RWScore = calculateScore(RWTime, 200, 100);
+                                                runMatrixTest().then(time => {
+                                                    matrixTime = time;
+                                                    updateResult('Matrix result', matrixTime);
+                                                    progressElement.textContent = 'Testing Fibonacci Recursion';                                                    
 
-                                                const totalScore = (
-                                                    singleThreadFloatScore * 0.15 +
-                                                    multiThreadFloatScore * 0.2 +
-                                                    singleThreadIntScore * 0.15 +
-                                                    multiThreadIntScore * 0.2 +
-                                                    singleThreadAESScore * 0.15 +
-                                                    multiThreadAESScore * 0.2 +
-                                                    PIScore * 0.15 +
-                                                    domRenderScore * 0.3 +
-                                                    RWScore * 0.15
-                                                ).toFixed(2);
-                                                
-                                                document.getElementById('floatscore').innerHTML = totalScore;
+                                                    runFibonacciTest().then(time => {
+                                                        fibonacciTime = time;
+                                                        updateResult('Fibonacci result', fibonacciTime);
+                                                        progressElement.textContent = 'Testing Sorting';                                                        
 
-                                                updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.3).toFixed(2) + ', PI:' + (PIScore * 0.15).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
+                                                        runSortingTest().then(time => {
+                                                            sortingTime = time;
+                                                            updateResult('Sorting result', sortingTime);
+                                                            progressElement.textContent = '';
 
-                                                var submitscoreDivs = document.getElementsByClassName('submitscore');
-                                                for (var i = 0; i < submitscoreDivs.length; i++) {
-                                                    submitscoreDivs[i].style.display = 'inline-block';
-                                                }
+                                                            const domRenderScore = calculateScore(domRenderTime, 1500, 100);
+                                                            const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
+                                                            const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
+                                                            const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
+                                                            const multiThreadIntScore = calculateScore(multiThreadIntTime, 100, 100);
+                                                            const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
+                                                            const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
+                                                            const PIScore = calculateScore(PITime, 1200, 100);
+                                                            const RWScore = calculateScore(RWTime, 200, 100);
+                                                            const matrixScore = calculateScore(matrixTime, 500, 100);
+                                                            const fibonacciScore = calculateScore(fibonacciTime, 800, 100);
+                                                            const sortingScore = calculateScore(sortingTime, 1000, 100);
+
+                                                            const totalScore = (
+                                                                singleThreadFloatScore * 0.15 +
+                                                                multiThreadFloatScore * 0.2 +
+                                                                singleThreadIntScore * 0.15 +
+                                                                multiThreadIntScore * 0.2 +
+                                                                singleThreadAESScore * 0.15 +
+                                                                multiThreadAESScore * 0.2 +
+                                                                PIScore * 0.15 +
+                                                                domRenderScore * 0.3 +
+                                                                RWScore * 0.15 +
+                                                                matrixScore * 0.1 +
+                                                                fibonacciScore * 0.1 +
+                                                                sortingScore * 0.1
+                                                            ).toFixed(2);
+                                                            
+                                                            document.getElementById('floatscore').innerHTML = totalScore;
+
+                                                            updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.3).toFixed(2) + ', PI:' + (PIScore * 0.15).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
+
+                                                            var submitscoreDivs = document.getElementsByClassName('submitscore');
+                                                            for (var i = 0; i < submitscoreDivs.length; i++) {
+                                                                submitscoreDivs[i].style.display = 'inline-block';
+                                                            }
+                                                        });
+                                                    });
+                                                });
                                             });
                                         });
                                     });
@@ -107,6 +131,48 @@ function runTest() {
                 });
             });
     }, 200);
+}
+
+function runMatrixTest() {
+    return new Promise((resolve) => {
+        const startTime = performance.now();
+        const worker = new Worker('worker.js?t=${Date.now()}');
+        worker.postMessage({ start: 0, end: 200000, type: 'matrix' });
+
+        worker.onmessage = (e) => {
+            const endTime = performance.now();
+            resolve(endTime - startTime);
+            worker.terminate();
+        };
+    });
+}
+
+function runFibonacciTest() {
+    return new Promise((resolve) => {
+        const startTime = performance.now();
+        const worker = new Worker('worker.js?t=${Date.now()}');
+        worker.postMessage({ start: 0, end: 100000, type: 'fibonacci' });
+
+        worker.onmessage = (e) => {
+            const endTime = performance.now();
+            resolve(endTime - startTime);
+            worker.terminate();
+        };
+    });
+}
+
+function runSortingTest() {
+    return new Promise((resolve) => {
+        const startTime = performance.now();
+        const worker = new Worker('worker.js?t=${Date.now()}');
+        worker.postMessage({ start: 0, end: 1000000, type: 'sorting' });
+
+        worker.onmessage = (e) => {
+            const endTime = performance.now();
+            resolve(endTime - startTime);
+            worker.terminate();
+        };
+    });
 }
 
 function runRWTest() {
@@ -385,7 +451,10 @@ function clearResults() {
         'multi-aes-result',
         'pi-result',
         'read-write-result',
-        'score'
+        'matrix-result',
+        'fibonacci-result',
+        'sorting-result',
+        'score',
     ];
 
     resultIds.forEach(id => {
