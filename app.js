@@ -62,9 +62,9 @@ function runTest() {
                                             updateResult('PI result', PITime);
                                             progressElement.textContent = 'Testing Read/Write...';
 
-                                            runRWTest().then(time => {
-                                                RWTime = time;
-                                                updateResult('Read Write result', RWTime);
+                                            runRWTest().then(result  => {
+                                                RWTime = result;
+                                                updateResult('Read Write result', `Read: ${RWTime.averageReadSpeed.toFixed(2)} mb/s, Write: ${RWTime.averageWriteSpeed.toFixed(2)} mb/s`);
                                                 progressElement.textContent = 'Testing Matrix Operations';
 
                                                 runMatrixTest().then(time => {
@@ -82,7 +82,7 @@ function runTest() {
                                                             updateResult('Sorting result', sortingTime);
                                                             progressElement.textContent = '';
 
-                                                            const domRenderScore = calculateScore(domRenderTime, 1500, 100);
+                                                            const domRenderScore = calculateScore(domRenderTime, 2000, 100);
                                                             const singleThreadFloatScore = calculateScore(singleThreadFloatTime, 1200, 100);
                                                             const multiThreadFloatScore = calculateScore(multiThreadFloatTime, 150, 100);
                                                             const singleThreadIntScore = calculateScore(singleThreadIntTime, 400, 100);
@@ -90,7 +90,7 @@ function runTest() {
                                                             const singleThreadAESScore = calculateScore(singleThreadAESTime, 2000, 100);
                                                             const multiThreadAESScore = calculateScore(multiThreadAESTime, 500, 100);
                                                             const PIScore = calculateScore(PITime, 1200, 100);
-                                                            const RWScore = calculateScore(RWTime, 200, 100);
+                                                            const RWScore = calculateSpeed(RWTime.averageReadSpeed, 1000, 100) + calculateSpeed(RWTime.averageWriteSpeed, 1000, 100);
                                                             const matrixScore = calculateScore(matrixTime, 500, 100);
                                                             const fibonacciScore = calculateScore(fibonacciTime, 800, 100);
                                                             const sortingScore = calculateScore(sortingTime, 1000, 100);
@@ -112,7 +112,7 @@ function runTest() {
                                                             
                                                             document.getElementById('floatscore').innerHTML = totalScore;
 
-                                                            updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.3).toFixed(2) + ', PI:' + (PIScore * 0.15).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
+                                                            updateScore(totalScore + ' (DOM:' + (domRenderScore * 0.3).toFixed(2) + ', Int:' + (singleThreadIntScore * 0.15 + multiThreadIntScore * 0.2).toFixed(2) + ', R/W:' + (RWScore * 0.15).toFixed(2) + ')');
 
                                                             var submitscoreDivs = document.getElementsByClassName('submitscore');
                                                             for (var i = 0; i < submitscoreDivs.length; i++) {
@@ -418,12 +418,20 @@ function calculateScore(time, baseTime, baseScore) {
     return (baseScore * baseTime) / time;
 }
 
+function calculateSpeed(speed, baseSpeed, baseScore) {
+    return (speed / baseSpeed) * baseScore;
+}
+
 function updateResult(testType, time) {
     const resultId = testType.toLowerCase().replace(/ /g, '-').replace(/\./g, '');
     const resultElement = document.getElementById(resultId);
-    if (resultElement) {
+    if(resultElement && resultElement.id === "read-write-result"){
+        resultElement.innerHTML = time;
+    }    
+    else if (resultElement) {
         resultElement.innerHTML = `${testType}: Time: ${time.toFixed(2)} ms`;
-    } else {
+    }
+    else {
         console.error(`Element with ID '${resultId}' not found.`);
     }
 }

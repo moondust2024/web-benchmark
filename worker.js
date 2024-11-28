@@ -47,7 +47,7 @@ self.addEventListener('error', (event) => {
 const dbName = 'TestDB';
 const storeName = 'TestStore';
 const dbVersion = 1;
-const testDataSize = 50 * 1000 * 1000;
+const testDataSize = 100 * 1000 * 1000;
 const testCount = 5;
 
 let db;
@@ -126,47 +126,56 @@ async function performSingleTest() {
                 return { writeTime: -1, readTime: -1 };
             }
 
-            return { writeTime: writeEndTime - writeStartTime, readTime: readEndTime - readStartTime };
+            const writeTime = (writeEndTime - writeStartTime) / 1000; // 转换为秒
+            const readTime = (readEndTime - readStartTime) / 1000; // 转换为秒
+        
+            const writeSpeed = testDataSize / (1024 * 1024) / writeTime; // MB/s
+            const readSpeed = testDataSize / (1024 * 1024) / readTime; // MB/s
+        
+            return { writeSpeed, readSpeed };
 }
 
 async function testReadWriteSpeed() {
-            await openDatabase();
+    await openDatabase();
 
-            // 预热
-            for (let i = 0; i < 2; i++) {
-                await performSingleTest();
-            }
+    // 预热
+    for (let i = 0; i < 2; i++) {
+        await performSingleTest();
+    }
 
-            let totalWriteTime = 0;
-            let totalReadTime = 0;
+    let totalWriteSpeed = 0;
+    let totalReadSpeed = 0;
+    let validTests = 0;
 
-            for (let i = 0; i < testCount; i++) {
-                const { writeTime, readTime } = await performSingleTest();
-                if (writeTime >= 0 && readTime >= 0) {
-                    totalWriteTime += writeTime;
-                    totalReadTime += readTime;
-                } else {
-                    console.error('测试失败，跳过本次结果');
-                }
-            }
+    for (let i = 0; i < testCount; i++) {
+        const { writeSpeed, readSpeed } = await performSingleTest();
+        if (writeSpeed >= 0 && readSpeed >= 0) {
+            totalWriteSpeed += writeSpeed;
+            totalReadSpeed += readSpeed;
+            validTests++;
+        } else {
+            console.error('Error in testReadWriteSpeed');
+        }
+    }
 
-            const averageWriteTime = totalWriteTime / testCount;
-            const averageReadTime = totalReadTime / testCount;
-            
-            await clearTestData();
+    const averageReadSpeed = totalReadSpeed / validTests;
+    const averageWriteSpeed = totalWriteSpeed / validTests;
 
-            return averageWriteTime + averageReadTime;
+    await clearTestData();
+
+    return { averageReadSpeed, averageWriteSpeed };
 }
 
 async function clearTestData() {
-            await openDatabase();
-            const transaction = db.transaction([storeName], 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.delete('testData');
-            
-            request.onerror = (event) => {
-                console.error('清理失败:', event.target.error);
-            };
+    const transaction = db.transaction([storeName], 'readwrite');
+    const store = transaction.objectStore(storeName);
+    const request = store.clear();
+    await new Promise((resolve, reject) => {
+        request.onsuccess = resolve;
+        request.onerror = (event) => {
+            reject(event.target.error);
+        };
+    });
 }
 
 async function loadCryptoJS() {
